@@ -1,6 +1,4 @@
-package com.example.jpanext.school.controller;
-
-import static org.hibernate.internal.util.collections.ArrayHelper.forEach;
+package com.example.jpanext.school;
 
 import com.example.jpanext.school.dto.ILCountDto;
 import com.example.jpanext.school.dto.ILCountProjection;
@@ -12,19 +10,21 @@ import com.example.jpanext.school.repo.AttendingLectureRepo;
 import com.example.jpanext.school.repo.InstructorRepository;
 import com.example.jpanext.school.repo.LectureRepository;
 import com.example.jpanext.school.repo.StudentRepository;
-import jakarta.transaction.Transactional;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.collection.spi.PersistentBag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -39,26 +39,88 @@ public class SchoolController {
     private final AttendingLectureRepo attendingLectureRepo;
     private final InstructorRepository instructorRepository;
 
+    @GetMapping("entity-graph")
+    public String entityGraph() {
+        List<Instructor> instructors = instructorRepository.findByEntityGraph();
+        for (Instructor instructor: instructors) {
+            log.info("{}", instructor.getAdvisingStudents().size());
+        }
+        return "done";
+    }
 
-    @GetMapping("test-agg")
+    @GetMapping("fetch-join")
+    public String fetchJoin() {
+//        List<Student> students = studentRepository.findAllFetchAdvisor();
+//        for (Student student: students) {
+//            student.getAdvisor().getName();
+//        }
+        List<Instructor> instructors = instructorRepository.findAllFetchStudents();
+        for (Instructor instructor: instructors) {
+            log.info("{}", instructor.getAdvisingStudents().size());
+        }
+
+        return "done";
+    }
+
+    @GetMapping("join")
+    public String join() {
+        log.info("{}", studentRepository.findAllJoin().size());
+        log.info("{}", studentRepository.findAllLeftJoin().size());
+        log.info("{}", studentRepository.findAllRightJoin().size());
+        log.info("{}", studentRepository.findByAdvisorName("Plato Best"));
+
+//        for (Student student: studentRepository.findAllJoin()) {
+//            student.getAdvisor().getName();
+//        }
+
+
+        return "done";
+    }
+
+    @GetMapping("fetch-type")
+    public String fetchType() {
+//        List<Instructor> instructors = instructorRepository.findAll();
+//        for (Instructor instructor: instructors) {
+//            // PersistentBag
+//            log.info("{}", instructor.getAdvisingStudents().getClass());
+//        }
+//        List<Student> students = studentRepository.findAll();
+//        for (Student student: students) {
+//            if (student.getAdvisor() != null) {
+//                log.info("{}", student.getAdvisor().getClass());
+//                log.info("{}", student.getAdvisor().getId());
+//            }
+//        }
+
+        // SELECT t FROM T t;
+        instructorRepository.findAll();
+        studentRepository.findAll();
+
+        return "done";
+    }
+
+    @GetMapping(value = "test-agg")
     public String testAggregate() {
         List<Object[]> results =
-                instructorRepository.selectIlCountObject();
-        for (Object[] row : results) {
+                instructorRepository.selectILCountObject();
+        for (Object[] row: results) {
             Instructor instructor = (Instructor) row[0];
-            // log.info(String.valueOf(row[1].getClass()));
+//            log.info(String.valueOf(row[1].getClass()));
             Long count = (Long) row[1];
             log.info("{}: {}", instructor.getName(), count);
         }
 
-        List<ILCountDto> resultDtos = instructorRepository.selectILCountDto();
-        for (ILCountDto dto : resultDtos) {
-            log.info("{} : {}", dto.getInstructor().getName(), dto.getCount());
+        List<ILCountDto> resultDtos =
+                instructorRepository.selectILCountDto();
+        for (ILCountDto dto: resultDtos) {
+            log.info("{}: {}",
+                    dto.getInstructor().getName(),
+                    dto.getCount());
         }
 
         List<ILCountProjection> resultProjs =
                 instructorRepository.selectILCountProj();
-        for (ILCountProjection projection : resultProjs) {
+        for (ILCountProjection projection: resultProjs) {
             log.info("{}: {}",
                     projection.getInstructor().getName(),
                     projection.getLectureCount());
@@ -69,12 +131,11 @@ public class SchoolController {
                         log.info("{}: {}",
                                 projection.getLecture().getName(),
                                 projection.getStudentCount()));
-                /*.forEach(objects ->
-                        log.info("{}: {}", objects));*/
+//                .forEach(objects ->
+//                        log.info("{}: {}", objects));
 
         return "done";
     }
-
 
     @GetMapping("test-query")
     public String testQuery() {
@@ -152,8 +213,6 @@ public class SchoolController {
 
         studentRepository.noAdvisorStudents().forEach(student ->
                 log.info("{}, {}", student.getId(), student.getName()));
-
-
 
         return "done";
     }
@@ -269,7 +328,7 @@ public class SchoolController {
 
         for (AttendingLectures attendingLecture: alex.getAttendingLectures()) {
             attendingLecture.setMidTermScore(80);
-            attendingLecture.setFinalScore(80);
+            attendingLecture.setFinalsScore(80);
             attendingLectureRepo.save(attendingLecture);
         }
         return "done";

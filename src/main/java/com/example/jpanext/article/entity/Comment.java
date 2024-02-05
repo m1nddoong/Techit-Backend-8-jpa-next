@@ -1,17 +1,11 @@
 package com.example.jpanext.article.entity;
 
 import com.example.jpanext.entity.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-
 
 @Getter
 @Entity
@@ -19,13 +13,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Comment extends BaseEntity {
-    /*
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    */
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
+
     private String content;
     private String writer;
+
     @ManyToOne
+    // FK의 형태를 설정하고 싶을 때
+    @JoinColumn(name = "article_id")
     private Article article;
 }

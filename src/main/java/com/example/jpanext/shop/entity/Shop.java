@@ -10,8 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Entity
 @Builder
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 public class Shop {

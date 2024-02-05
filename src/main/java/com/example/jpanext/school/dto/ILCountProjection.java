@@ -6,8 +6,8 @@ public interface ILCountProjection {
     /*
     private Instructor instructor;
     private Long lectureCount;
-    */
-    Instructor getInstructor();
+     */
 
+    Instructor getInstructor();
     Long getLectureCount();
 }

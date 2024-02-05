@@ -1,20 +1,11 @@
 package com.example.jpanext.school.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
+
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @Builder
@@ -39,7 +30,6 @@ public class Lecture {
     @ManyToOne
     @JoinColumn(name = "instructor_id")
     private Instructor instructor;
-
 
     // 상세설정은 mappedBy가 가르키는 속성에 따른다.
     @ManyToMany(mappedBy = "attending")

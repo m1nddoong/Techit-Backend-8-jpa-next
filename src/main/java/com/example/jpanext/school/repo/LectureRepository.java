@@ -1,10 +1,7 @@
 package com.example.jpanext.school.repo;
 
 import com.example.jpanext.school.dto.LectureStudentCount;
-import com.example.jpanext.school.entity.Instructor;
 import com.example.jpanext.school.entity.Lecture;
-import java.util.Collection;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -12,6 +9,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.util.Collection;
+import java.util.List;
 
 public interface LectureRepository
         extends JpaRepository<Lecture, Long> {
@@ -55,7 +55,7 @@ public interface LectureRepository
             Integer endTime
     );
     /**
-     * <code>SELECT * FROM lecture WHERE day in ('mon', 'tue', 'wed')</code>
+     * <code>SELECT * FROM lecture WHERE day IN ('mon', 'tue', 'wed')</code>
      */
     @Query("SELECT l FROM Lecture l WHERE l.day IN :days")
     List<Lecture> findByDayIn(
@@ -108,18 +108,11 @@ public interface LectureRepository
             @Param("day") String day
     );
 
-    // 강의 Lecture와 해당 Lecture를 듣는 학생 수의 리스트를 반환
-    @Query("SELECT l, SIZE(l.students) FROM Lecture l")
-    List<Object[]> selectWithStudent();
-
     // 강의 Lecture와 해당 Lecture를 듣는 학생 수의 리스트
 //    @Query("SELECT l, SIZE(l.students) FROM Lecture l")
 //    List<Object[]> selectWithStudentCount();
 
-    @Query("SELECT l AS lecture, SIZE(l.students) AS studnetCount " +
+    @Query("SELECT l AS lecture, SIZE(l.students) AS studentCount " +
             "FROM Lecture l")
     List<LectureStudentCount> selectWithStudentCount();
-
 }
-
-
